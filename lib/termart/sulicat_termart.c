@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
 
 /*
 
@@ -49,6 +52,13 @@ It includes the following functionality
 #define YELLOW_BG "\e[43m"
 #define WHITE_BG "\e[47m"
 
+#define BOLD "\e[1m"
+#define UNDELINE "\e[1m"
+#define DIM "\e[2m"
+#define BLINK "\e[5m"
+
+#define CLEAR_LINE "\e[2K"	
+
 
 
 /* the structs */
@@ -72,7 +82,8 @@ struct domain {
 
 } domain;
 
-
+int terminal_height;
+int terminal_width;
 
 
 // -----------------------------------------------------------------------------------------------
@@ -281,11 +292,174 @@ void termart_set_size( struct domain * arr, char * name, int width, int height )
 }
 
 
+// toggle bold attribute
+void termart_toggle_bold( struct domain * arr, char * name  ){
+
+	int length_of_array = arr[0].length_of_array;
+	int i = 0;
+	for( i = 1; i < length_of_array; i++){
+		if( arr[i].name == name ){
+			if (arr[i].is_bold != 0){
+				arr[i].is_bold = 0;
+			}else{
+				arr[i].is_bold = 1;
+			}
+		}
+	}
+}
+
+
+
+// toggle underline attribute
+void termart_toggle_underline( struct domain * arr, char * name  ){
+
+	int length_of_array = arr[0].length_of_array;
+	int i = 0;
+	for( i = 1; i < length_of_array; i++){
+		if( arr[i].name == name ){
+			if (arr[i].is_underlined != 0){
+				arr[i].is_underlined = 0;
+			}else{
+				arr[i].is_underlined = 1;
+			}
+		}
+	}
+}
+
+
+// toggle blinking attribute
+void termart_toggle_blink( struct domain * arr, char * name  ){
+
+	int length_of_array = arr[0].length_of_array;
+	int i = 0;
+	for( i = 1; i < length_of_array; i++){
+		if( arr[i].name == name ){
+			if (arr[i].is_blinking != 0){
+				arr[i].is_blinking = 0;
+			}else{
+				arr[i].is_blinking = 1;
+			}
+		}
+	}
+}
+
+
+// get terminal width
+int termart_get_width( struct domain * arr ){
+
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	return (int)(w.ws_col);
+}
+
+
+// get terminal height
+int termart_get_height( struct domain * arr ){
+
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	return (int)(w.ws_row);
+}
+
+
+
+void termart_set_cursor( struct domain * arr, int x, int y ){
+	printf("\e[%d;%dH", x, y );
+}
+
+
+
+// -----------------------------------------------------------------------------------------------
+
+
+// this is the draw function
+// it works as follows
+// - clear screen
+// - get the size of the terminal window
+// - print all the colors and atributes
+// - start drawing from the first line, by moving the cursor to a certain domain 
+//	 then looping through all the text set by it
+
+void termart_draw( struct domain * arr ){
+
+	//	loop through all the rows and delete them
+	// clear the terminal
+	int i = 0;
+	int row = 0;
+	int col = 0;
+	for( i = 0; i < termart_get_height( arr ); i++){
+		// to row position
+		printf("\e[%d;%dH", row, col );
+		// clear the row
+		printf( CLEAR_LINE );
+		row += 1;
+	}
+
+	// now terminal is clear. 
+	// we will move to the top left
+	row = 0;
+	col = 0;
+	printf("\e[%d;%dH", row, col );
+	// now cycle through the domain array
+	
+	int num_of_filled_lines = 0;
+	for( i = 1; i < arr[0].length_of_array; i++ ){
+
+		// find how many rows will be needed to write all the text. 
+		// int text_length / int domain width 
+		int num_of_rows_needed = 0;
+		int text_length = strlen( arr[i].text );
+		num_of_rows_needed = text_length / arr[i].width;
+		// cycle through every letter
+		// print it in the correct spot
+		int x = 0;
+		row = arr[i].y;
+		col = arr[i].x;
+		printf("\e[%d;%dH", row, col );
+
+
+		// change foreground color
+		printf("%s", arr[i].color );
+		// change background color
+		printf("%s", arr[i].color_bg );
+
+
+		for( x = 0; x < text_length; x++ ){
+			// go to row and col
+			printf("\e[%d;%dH", row, col );
+			// print current letter
+			printf("%c" , arr[i].text[x] );
+			//increment col by 1
+			col = col + 1;
+			if( x % arr[i].width == 0 && x != 0 ){
+				row = row + 1;
+				col = arr[i].x;
+			}
+
+
+		}
+
+		
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
 // -----------------------------------------------------------------------------------------------
 
 
 
-
+ 
 int main( int argc, char ** argv){
 
 	struct domain * screen_obj = termart_init();
@@ -293,13 +467,18 @@ int main( int argc, char ** argv){
 	termart_add( screen_obj, "cat" );
 	termart_change_color( screen_obj, "cat", "purple");
 	termart_add_text( screen_obj, "cat", "this is the text to be added to the domain " );
+	termart_add_text( screen_obj, "hello", "123456789101112" );
 	termart_set_pos( screen_obj, "cat", 10, 10 );
-	termart_set_size( screen_obj, "hello", 100,100 );
+	termart_set_size( screen_obj, "hello", 10,10 );
 	termart_change_bg( screen_obj, "hello", "green" );
-	termart_change_bg( screen_obj, "cat", "white" );
-	termart_change_bg( screen_obj, "cat", "black" );
+	termart_change_bg( screen_obj, "cat", "green" );
+	termart_change_bg( screen_obj, "cat", "red" );
+	termart_set_size( screen_obj, "cat", 10, 10);
+	termart_change_color( screen_obj, "hello", "white" );
+	termart_set_pos( screen_obj, "hello", 10,50 );
 
-	termart_to_string( screen_obj );
+	termart_set_cursor( screen_obj, 10,10 );
+	termart_draw( screen_obj );
 
 	return 0;
 
