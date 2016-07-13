@@ -95,6 +95,8 @@ struct domain * termart_init() {
  	struct domain * array_domain = malloc( sizeof(struct domain) );
  	array_domain[0].name = "length_of_array"; array_domain[0].id = 0;
  	array_domain[0].length_of_array = 1;
+ 	array_domain[0].color_bg = WHITE_BG;
+ 	printf("%s", WHITE );
 
 	return array_domain;
 }
@@ -110,7 +112,8 @@ struct domain * termart_add( struct domain * arr, char * name ) {
 
 	arr[ length_of_array ].name = name;
 	arr[ length_of_array ].id = length_of_array;
-	arr[ length_of_array ].text = "";
+	//arr[ length_of_array ].text = malloc( sizeof(char) * 2 );
+	arr[ length_of_array ].text = " ";
 	arr[ length_of_array ].color = BLACK;
 	arr[ length_of_array ].color_bg = BLACK;
 	arr[ length_of_array ].x = 0;
@@ -253,10 +256,13 @@ void termart_add_text( struct domain * arr, char * name, char * text ){
 	int length_of_array = arr[0].length_of_array;
 	int i = 0;
 
+
 	// loop through to look for the correct name
 	for( i = 1; i < length_of_array; i++){
 		if( arr[i].name == name ){
-			arr[i].text = text; // add the text
+			arr[i].text = malloc( sizeof(char) * strlen(text) );
+			//arr[i].text = realloc( arr[i].text, sizeof(char) * strlen(text) );
+			strcpy(arr[i].text, text); // add the text
 		}
 	}
 }
@@ -327,6 +333,29 @@ void termart_toggle_underline( struct domain * arr, char * name  ){
 }
 
 
+/*
+char * termart_get_text_full( struct domain * arr, char * name ){
+	char * temp = malloc( sizeof(char) * termart_get_width(arr) * termart_get_height( arr ) );
+	int i;
+	for( i = 1; i < arr[0].length_of_array; i++){
+		if( arr[i].name == name ){
+
+			int x;
+			for( x = 0; x < strlen(arr[i].text); x++ ){
+				temp[x] = arr[i].text[x];
+				printf("%s\n", "a" );
+			}
+
+
+
+		}
+	}
+
+	return temp;
+
+}
+*/
+
 // toggle blinking attribute
 void termart_toggle_blink( struct domain * arr, char * name  ){
 
@@ -368,6 +397,50 @@ void termart_set_cursor( struct domain * arr, int x, int y ){
 }
 
 
+void set_main_bg_color( struct domain * arr, char * color ){
+
+	if( color == "red" || color == "RED" || color == RED )
+		arr[0].color_bg = RED_BG;
+	else if( color == "blue" || color == "BLUE" || color == BLUE )
+		arr[0].color_bg = BLUE_BG;
+	else if( color == "green" || color == "GREEN" || color == GREEN )
+		arr[0].color_bg = GREEN_BG;
+	else if( color == "purple" || color == "PURPLE" || color == PURPLE )
+		arr[0].color_bg = PURPLE_BG;
+	else if( color == "yellow" || color == "YELLOW" || color == YELLOW )
+		arr[0].color_bg = YELLOW_BG;
+	else if( color == "white" || color == "WHITE" || color == WHITE )
+		arr[0].color_bg = WHITE_BG;
+	else if( color == "black" || color == "BLACK" || color == BLACK )
+		arr[0].color_bg = BLACK_BG;
+	else{
+		arr[0].color_bg = color;
+	}
+
+}
+
+
+
+void termart_fill_domain( struct domain * arr, char * name ){
+
+	int i = 1;
+
+	for( i = 1; i < arr[0].length_of_array; i++ ){
+		if(arr[i].name == name){
+
+			arr[i].text = realloc(arr[i].text, sizeof(char) * arr[i].width * arr[i].height);
+			
+			//printf("%d\n", (int)strlen(arr[i].text) );
+			int x;
+			for( x = strlen(arr[i].text); x < arr[i].width * arr[i].height; x++ ){
+				strcat(arr[i].text, " ");
+			}
+
+		}
+	}
+
+}
+
 
 // -----------------------------------------------------------------------------------------------
 
@@ -381,6 +454,9 @@ void termart_set_cursor( struct domain * arr, int x, int y ){
 //	 then looping through all the text set by it
 
 void termart_draw( struct domain * arr ){
+
+	// set the color to the main background color
+	printf("%s", arr[0].color_bg );
 
 	//	loop through all the rows and delete them
 	// clear the terminal
@@ -437,11 +513,16 @@ void termart_draw( struct domain * arr ){
 			}
 
 
-		}
-
-		
+		}	
 
 	}
+
+
+
+	printf("%s", arr[0].color_bg );
+	printf("\e[%d;%dH ", termart_get_width( arr ), termart_get_height( arr ));
+
+
 
 }
 
@@ -465,20 +546,39 @@ int main( int argc, char ** argv){
 	struct domain * screen_obj = termart_init();
 	termart_add( screen_obj, "hello" );
 	termart_add( screen_obj, "cat" );
+	termart_add( screen_obj, "three" );
+	
+	termart_add( screen_obj, "four" );
+	termart_set_size( screen_obj, "four", 20, 20 );
+	termart_set_pos( screen_obj, "four", 50,50 );
+	termart_add_text( screen_obj, "four", "this is the fourth texxt" );
+	termart_fill_domain( screen_obj, "four" );
+
+	
 	termart_change_color( screen_obj, "cat", "purple");
-	termart_add_text( screen_obj, "cat", "this is the text to be added to the domain " );
+	termart_add_text( screen_obj, "cat", "this is the text to be addasdasded to the domain " );
 	termart_add_text( screen_obj, "hello", "123456789101112" );
+	termart_add_text( screen_obj, "three", "123456789101112" );
 	termart_set_pos( screen_obj, "cat", 10, 10 );
+	termart_set_pos( screen_obj, "three", 50, 10 );
 	termart_set_size( screen_obj, "hello", 10,10 );
+	termart_set_size( screen_obj, "three", 10,10 );
 	termart_change_bg( screen_obj, "hello", "green" );
 	termart_change_bg( screen_obj, "cat", "green" );
 	termart_change_bg( screen_obj, "cat", "red" );
 	termart_set_size( screen_obj, "cat", 10, 10);
 	termart_change_color( screen_obj, "hello", "white" );
 	termart_set_pos( screen_obj, "hello", 10,50 );
+	
 
+
+
+//	termart_get_text_full( screen_obj, "hello" );
+	termart_fill_domain( screen_obj, "hello" );
+	termart_fill_domain( screen_obj, "cat" );
 	termart_set_cursor( screen_obj, 10,10 );
 	termart_draw( screen_obj );
+	
 
 	return 0;
 
