@@ -432,8 +432,9 @@ void termart_fill_domain( struct domain * arr, char * name ){
 			
 			//printf("%d\n", (int)strlen(arr[i].text) );
 			int x;
-			for( x = strlen(arr[i].text); x < arr[i].width * arr[i].height; x++ ){
-				strcat(arr[i].text, " ");
+			for( x = strlen(arr[i].text); x < (arr[i].width * arr[i].height); x++ ){
+
+					strcat(arr[i].text, " ");
 			}
 
 		}
@@ -499,15 +500,17 @@ void termart_draw( struct domain * arr ){
 		// change background color
 		printf("%s", arr[i].color_bg );
 
+	
 
-		for( x = 0; x < text_length; x++ ){
+		for( x = 0; x <= text_length ; x++ ){
 			// go to row and col
 			printf("\e[%d;%dH", row, col );
 			// print current letter
 			printf("%c" , arr[i].text[x] );
 			//increment col by 1
 			col = col + 1;
-			if( x % arr[i].width == 0 && x != 0 ){
+			if( col % arr[i].width == 0  ){
+				printf(" ");
 				row = row + 1;
 				col = arr[i].x;
 			}
@@ -517,7 +520,7 @@ void termart_draw( struct domain * arr ){
 
 	}
 
-
+	// following is an inclomplete fix 
 
 	printf("%s", arr[0].color_bg );
 	printf("\e[%d;%dH ", termart_get_width( arr ), termart_get_height( arr ));
@@ -542,6 +545,8 @@ void termart_draw( struct domain * arr ){
 
  
 int main( int argc, char ** argv){
+
+	/*
 
 	struct domain * screen_obj = termart_init();
 	termart_add( screen_obj, "hello" );
@@ -569,6 +574,8 @@ int main( int argc, char ** argv){
 	termart_set_size( screen_obj, "cat", 10, 10);
 	termart_change_color( screen_obj, "hello", "white" );
 	termart_set_pos( screen_obj, "hello", 10,50 );
+
+	termart_add( screen_obj, "four" );
 	
 
 
@@ -578,7 +585,21 @@ int main( int argc, char ** argv){
 	termart_fill_domain( screen_obj, "cat" );
 	termart_set_cursor( screen_obj, 10,10 );
 	termart_draw( screen_obj );
-	
+*/
+
+
+	struct domain * screen_obj = termart_init();
+
+	termart_add( screen_obj, "obj_one" );
+
+	termart_set_pos( screen_obj, "obj_one", 10, 10 );
+	termart_change_color( screen_obj, "obj_one", "black" );
+	termart_set_size( screen_obj, "obj_one", 5, 5 );
+	termart_add_text( screen_obj, "obj_one", "hello worldsssss" );
+	termart_change_bg( screen_obj, "obj_one", "green" );
+	termart_fill_domain( screen_obj, "obj_one" );
+
+	termart_draw( screen_obj );
 
 	return 0;
 
