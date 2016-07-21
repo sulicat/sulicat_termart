@@ -569,9 +569,21 @@ int main( int argc, char ** argv){
 
 //	struct domain * screen_obj = termart_init();
 
+	
+	termart_add( screen_obj, "obj_two" );
 	termart_add( screen_obj, "obj_one" );
 
-	termart_set_pos( screen_obj, "obj_one", 10, 10 );
+	termart_set_pos( screen_obj, "obj_two", 10, 10 );
+	termart_change_color( screen_obj, "obj_two", "black" );
+	termart_set_size( screen_obj, "obj_two", 30, 10 );
+	termart_add_text( screen_obj, "obj_two", "aasdasdadadasd" );
+	termart_change_bg( screen_obj, "obj_two", "blue" );
+	termart_fill_domain( screen_obj, "obj_two" );
+
+
+
+
+	termart_set_pos( screen_obj, "obj_one", 40, 10 );
 	termart_change_color( screen_obj, "obj_one", "black" );
 	termart_set_size( screen_obj, "obj_one", 5, 5 );
 	termart_add_text( screen_obj, "obj_one", "hello worldsssss" );
@@ -580,10 +592,7 @@ int main( int argc, char ** argv){
 
 
 
-	termart_add( screen_obj, "obj_two" );
-	termart_set_size( screen_obj, "obj_two", 30, 10 );
-	termart_set_size()
-
+	
 
 	termart_draw( screen_obj );
 
