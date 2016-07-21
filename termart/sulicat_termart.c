@@ -11,11 +11,11 @@ This is a collection of functions to make the terminal more visualy apealing. TH
 
 It includes the following functionality
 
-	- create domains within the terminal
-	- write within the domains, while having a wrap function
+	- create domains within the terminal 							done
+	- write within the domains, while having a wrap function 		done
 	- draw borders the domains
-	- be able to change the color of the text within the domain
-	- align text (optional)
+	- be able to change the color of the text within the domain 	done
+	- align text (optional)											
 	
 	- have the ability to make buttons 
 	- get mouse location
@@ -51,6 +51,7 @@ It includes the following functionality
 #define GREY_BG "\e[47m"
 #define YELLOW_BG "\e[43m"
 #define WHITE_BG "\e[47m"
+#define CLEAR_BG ""
 
 #define BOLD "\e[1m"
 #define UNDELINE "\e[1m"
@@ -68,6 +69,7 @@ struct domain {
 	char * text;
 	char * color;
 	char * color_bg;
+	char * color_border;
 	int x;
 	int y;
 	int width;
@@ -333,29 +335,6 @@ void termart_toggle_underline( struct domain * arr, char * name  ){
 }
 
 
-/*
-char * termart_get_text_full( struct domain * arr, char * name ){
-	char * temp = malloc( sizeof(char) * termart_get_width(arr) * termart_get_height( arr ) );
-	int i;
-	for( i = 1; i < arr[0].length_of_array; i++){
-		if( arr[i].name == name ){
-
-			int x;
-			for( x = 0; x < strlen(arr[i].text); x++ ){
-				temp[x] = arr[i].text[x];
-				printf("%s\n", "a" );
-			}
-
-
-
-		}
-	}
-
-	return temp;
-
-}
-*/
-
 // toggle blinking attribute
 void termart_toggle_blink( struct domain * arr, char * name  ){
 
@@ -417,7 +396,39 @@ void set_main_bg_color( struct domain * arr, char * color ){
 		arr[0].color_bg = color;
 	}
 
+
 }
+
+
+
+void termart_add_border( struct domain * arr, char * name, char * color ){
+
+	/*
+	
+	text_____
+	_________
+	_________
+	*/
+
+	int i;
+	for( i = 0; i < arr[0].length_of_array; i++){
+		if( arr[i].name == name){
+
+			int width = arr[i].width;	
+
+
+		}
+	}
+
+
+	
+
+
+
+	printf("a\n");
+
+}
+
 
 
 
@@ -436,10 +447,8 @@ void termart_fill_domain( struct domain * arr, char * name ){
 
 					strcat(arr[i].text, " ");
 			}
-
 		}
 	}
-
 }
 
 
@@ -514,10 +523,7 @@ void termart_draw( struct domain * arr ){
 				row = row + 1;
 				col = arr[i].x;
 			}
-
-
 		}	
-
 	}
 
 	// following is an inclomplete fix 
@@ -546,40 +552,13 @@ void termart_draw( struct domain * arr ){
  
 int main( int argc, char ** argv){
 
-	/*
+	
 
 	struct domain * screen_obj = termart_init();
-	termart_add( screen_obj, "hello" );
-	termart_add( screen_obj, "cat" );
-	termart_add( screen_obj, "three" );
-	
-	termart_add( screen_obj, "four" );
-	termart_set_size( screen_obj, "four", 20, 20 );
-	termart_set_pos( screen_obj, "four", 50,50 );
-	termart_add_text( screen_obj, "four", "this is the fourth texxt" );
-	termart_fill_domain( screen_obj, "four" );
-
-	
-	termart_change_color( screen_obj, "cat", "purple");
-	termart_add_text( screen_obj, "cat", "this is the text to be addasdasded to the domain " );
-	termart_add_text( screen_obj, "hello", "123456789101112" );
-	termart_add_text( screen_obj, "three", "123456789101112" );
-	termart_set_pos( screen_obj, "cat", 10, 10 );
-	termart_set_pos( screen_obj, "three", 50, 10 );
-	termart_set_size( screen_obj, "hello", 10,10 );
-	termart_set_size( screen_obj, "three", 10,10 );
-	termart_change_bg( screen_obj, "hello", "green" );
-	termart_change_bg( screen_obj, "cat", "green" );
-	termart_change_bg( screen_obj, "cat", "red" );
-	termart_set_size( screen_obj, "cat", 10, 10);
-	termart_change_color( screen_obj, "hello", "white" );
-	termart_set_pos( screen_obj, "hello", 10,50 );
-
-	termart_add( screen_obj, "four" );
-	
 
 
 
+/*
 //	termart_get_text_full( screen_obj, "hello" );
 	termart_fill_domain( screen_obj, "hello" );
 	termart_fill_domain( screen_obj, "cat" );
@@ -588,7 +567,7 @@ int main( int argc, char ** argv){
 */
 
 
-	struct domain * screen_obj = termart_init();
+//	struct domain * screen_obj = termart_init();
 
 	termart_add( screen_obj, "obj_one" );
 
@@ -598,6 +577,13 @@ int main( int argc, char ** argv){
 	termart_add_text( screen_obj, "obj_one", "hello worldsssss" );
 	termart_change_bg( screen_obj, "obj_one", "green" );
 	termart_fill_domain( screen_obj, "obj_one" );
+
+
+
+	termart_add( screen_obj, "obj_two" );
+	termart_set_size( screen_obj, "obj_two", 30, 10 );
+	termart_set_size()
+
 
 	termart_draw( screen_obj );
 
